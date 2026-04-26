@@ -4,7 +4,8 @@
   "private": true,
   "description": "AgentCron — autonomous onchain execution engine. AI agents reason about chain conditions and execute actions on MagicBlock Ephemeral Rollups.",
   "workspaces": [
-    "web"
+    "web",
+    "shared"
   ],
   "scripts": {
     "dev:web": "npm run dev --workspace=web",
