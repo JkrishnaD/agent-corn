@@ -1,0 +1,638 @@
+{
+  "address": "CJ2uqxr4XVD22a66hcpat524KUkAPTeZMmgM15tRFugC",
+  "metadata": {
+    "name": "agent_cron",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "commit",
+      "discriminator": [
+        223,
+        140,
+        142,
+        165,
+        229,
+        208,
+        156,
+        74
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "agent_context",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "agent_context.rule_id",
+                "account": "AgentContext"
+              }
+            ]
+          }
+        },
+        {
+          "name": "magic_program",
+          "address": "Magic11111111111111111111111111111111111111"
+        },
+        {
+          "name": "magic_context",
+          "writable": true,
+          "address": "MagicContext1111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "commit_and_undelegate",
+      "discriminator": [
+        9,
+        108,
+        132,
+        87,
+        184,
+        76,
+        98,
+        84
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "agent_context",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "agent_context.rule_id",
+                "account": "AgentContext"
+              }
+            ]
+          }
+        },
+        {
+          "name": "magic_program",
+          "address": "Magic11111111111111111111111111111111111111"
+        },
+        {
+          "name": "magic_context",
+          "writable": true,
+          "address": "MagicContext1111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "delegate",
+      "discriminator": [
+        90,
+        147,
+        75,
+        178,
+        85,
+        88,
+        4,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "buffer_agent_context",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  117,
+                  102,
+                  102,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "agent_context"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                167,
+                205,
+                151,
+                65,
+                63,
+                144,
+                162,
+                95,
+                91,
+                239,
+                118,
+                139,
+                15,
+                212,
+                75,
+                69,
+                2,
+                120,
+                169,
+                103,
+                114,
+                116,
+                254,
+                129,
+                144,
+                96,
+                166,
+                173,
+                30,
+                133,
+                253,
+                193
+              ]
+            }
+          }
+        },
+        {
+          "name": "delegation_record_agent_context",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  108,
+                  101,
+                  103,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "agent_context"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "delegation_program"
+            }
+          }
+        },
+        {
+          "name": "delegation_metadata_agent_context",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  108,
+                  101,
+                  103,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  45,
+                  109,
+                  101,
+                  116,
+                  97,
+                  100,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "agent_context"
+              }
+            ],
+            "program": {
+              "kind": "account",
+              "path": "delegation_program"
+            }
+          }
+        },
+        {
+          "name": "agent_context",
+          "docs": [
+            "context for `(owner, rule_id)`."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "arg",
+                "path": "rule_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner_program",
+          "address": "CJ2uqxr4XVD22a66hcpat524KUkAPTeZMmgM15tRFugC"
+        },
+        {
+          "name": "delegation_program",
+          "address": "DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "rule_id",
+          "type": {
+            "array": [
+              "u8",
+              16
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "agent_context",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "arg",
+                "path": "rule_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "rule_id",
+          "type": {
+            "array": [
+              "u8",
+              16
+            ]
+          }
+        },
+        {
+          "name": "prompt_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "process_undelegation",
+      "discriminator": [
+        196,
+        28,
+        41,
+        206,
+        48,
+        37,
+        51,
+        167
+      ],
+      "accounts": [
+        {
+          "name": "base_account",
+          "writable": true
+        },
+        {
+          "name": "buffer"
+        },
+        {
+          "name": "payer",
+          "writable": true
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "account_seeds",
+          "type": {
+            "vec": "bytes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "record_decision",
+      "discriminator": [
+        13,
+        153,
+        150,
+        233,
+        19,
+        198,
+        102,
+        140
+      ],
+      "accounts": [
+        {
+          "name": "agent_context",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              },
+              {
+                "kind": "account",
+                "path": "agent_context.rule_id",
+                "account": "AgentContext"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "confidence",
+          "type": "u8"
+        },
+        {
+          "name": "executed",
+          "type": "bool"
+        },
+        {
+          "name": "reasoning_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AgentContext",
+      "discriminator": [
+        205,
+        1,
+        239,
+        105,
+        38,
+        102,
+        33,
+        106
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidConfidence",
+      "msg": "confidence must be in 0..=100"
+    },
+    {
+      "code": 6001,
+      "name": "Unauthorized",
+      "msg": "only the rule owner can call this instruction"
+    }
+  ],
+  "types": [
+    {
+      "name": "AgentContext",
+      "docs": [
+        "Per-rule on-chain state. Lives on base layer until delegated to MagicBlock.",
+        "While delegated, `record_decision` writes happen on the Ephemeral Rollup",
+        "(sub-50ms) and either auto-commit or are settled via `commit_state` /",
+        "`commit_and_undelegate_state`.",
+        "",
+        "Only hashes are stored — full reasoning text remains off-chain. The hash",
+        "proves the agent did not retroactively rewrite the prompt or rationale."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "docs": [
+              "Wallet that owns the rule (and only one allowed to mutate state)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "rule_id",
+            "docs": [
+              "16-byte UUID of the rule (matches the off-chain Rule.id)."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
+            }
+          },
+          {
+            "name": "prompt_hash",
+            "docs": [
+              "SHA-256 of the user's reasoning prompt at rule-creation time."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "executions",
+            "docs": [
+              "Total number of LLM decisions recorded against this rule."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "fired",
+            "docs": [
+              "Number of decisions where the LLM said \"execute\"."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "last_confidence",
+            "docs": [
+              "Confidence (0..=100) of the most recent decision."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "last_executed",
+            "docs": [
+              "Whether the most recent decision resulted in an action."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "last_decision_at",
+            "docs": [
+              "Unix timestamp (seconds) of the most recent decision."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "last_reasoning_hash",
+            "docs": [
+              "SHA-256 of the most recent reasoning rationale text."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "Bump for the PDA derivation."
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "AGENT_SEED",
+      "type": "bytes",
+      "value": "[97, 103, 101, 110, 116]"
+    }
+  ]
+}
