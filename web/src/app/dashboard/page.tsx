@@ -104,6 +104,12 @@ export default function Dashboard() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <Link
+              href="/config"
+              className="hidden sm:inline-flex font-mono text-[11px] tracking-wider uppercase text-ice/50 hover:text-ice px-3 py-1.5 rounded-full transition-colors"
+            >
+              config
+            </Link>
             {status && (
               <button
                 onClick={handleToggleAgent}
@@ -408,24 +414,29 @@ function RuleCard({
           <div className="flex items-center gap-2 shrink-0">
             <button
               disabled={toggling}
+              title={rule.enabled ? "pause this rule" : "resume this rule"}
               onClick={async () => {
                 setToggling(true);
-                await onToggle(rule.id, !rule.enabled);
+                onToggle(rule.id, !rule.enabled);
                 setToggling(false);
               }}
-              className={`font-mono text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border transition-all ${
+              className={`font-mono text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border transition-all disabled:opacity-50 ${
                 rule.enabled
                   ? "text-sky border-sky/30 bg-sky/10 hover:bg-sky/15"
-                  : "text-ice/50 border-line hover:text-ice hover:border-edge"
+                  : "text-amber-300 border-amber-400/30 bg-amber-400/10 hover:bg-amber-400/15"
               }`}
             >
-              {toggling ? "…" : rule.enabled ? "live" : "paused"}
+              {toggling
+                ? "…"
+                : rule.enabled
+                ? "live · pause"
+                : "paused · resume"}
             </button>
             <button
               disabled={deleting}
               onClick={async () => {
                 setDeleting(true);
-                await onDelete(rule.id);
+                onDelete(rule.id);
               }}
               className="font-mono text-[10px] uppercase tracking-[0.2em] text-ice/40 hover:text-red-400 transition-colors px-2 py-1.5"
             >

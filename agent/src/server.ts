@@ -23,7 +23,7 @@ export function startServer(loop: AgentLoop) {
   const http = createServer(async (req, res) => {
     res.setHeader("access-control-allow-origin", "*");
     res.setHeader("access-control-allow-headers", "content-type");
-    res.setHeader("access-control-allow-methods", "GET,POST,DELETE,OPTIONS");
+    res.setHeader("access-control-allow-methods", "GET,POST,PATCH,DELETE,OPTIONS");
     if (req.method === "OPTIONS") return res.end();
 
     const url = new URL(req.url ?? "/", `http://${req.headers.host}`);
