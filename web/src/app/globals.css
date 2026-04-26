@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #040814;
+}
+
+body {
+  @apply bg-bg text-ice/90 font-sans antialiased;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(73, 136, 196, 0.12), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(28, 77, 141, 0.10), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(15, 40, 84, 0.20), transparent 60%);
+}
+
+::selection {
+  background: rgba(73, 136, 196, 0.35);
+  color: #BDE8F5;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(73,136,196,0.25); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(73,136,196,0.5); }
+
+/* Halftone dot pattern overlay */
+.bg-halftone {
+  background-image: radial-gradient(rgba(189, 232, 245, 0.10) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.bg-halftone-dense {
+  background-image: radial-gradient(rgba(189, 232, 245, 0.18) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(189, 232, 245, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(189, 232, 245, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Gradient text */
+.text-brand-gradient {
+  background: linear-gradient(135deg, #BDE8F5 0%, #4988C4 50%, #1C4D8D 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-ice-gradient {
+  background: linear-gradient(180deg, #FFFFFF 0%, #BDE8F5 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Gradient border via mask */
+.gradient-border {
+  position: relative;
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(189,232,245,0.35), rgba(73,136,196,0.05) 50%, rgba(189,232,245,0.20));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Primary CTA */
+.btn-primary {
+  background: linear-gradient(135deg, #4988C4 0%, #BDE8F5 100%);
+  color: #040814;
+  box-shadow:
+    0 8px 32px -8px rgba(73, 136, 196, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 40px -10px rgba(73, 136, 196, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  background: rgba(189, 232, 245, 0.04);
+  border: 1px solid rgba(189, 232, 245, 0.12);
+  color: #BDE8F5;
+  transition: all 200ms ease;
+}
+.btn-ghost:hover {
+  background: rgba(189, 232, 245, 0.08);
+  border-color: rgba(189, 232, 245, 0.25);
+}
+
+/* Glow orb */
+.glow-orb {
+  background: radial-gradient(circle, rgba(73,136,196,0.55) 0%, rgba(28,77,141,0.30) 30%, rgba(15,40,84,0.10) 55%, transparent 75%);
+  filter: blur(60px);
+}
+
+/* Wallet adapter overrides */
+.wallet-adapter-button {
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  height: auto !important;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+}
+.wallet-adapter-modal-wrapper { background: #070D1F !important; }
+.wallet-adapter-modal-title { color: #BDE8F5 !important; }
+
+/* Inputs */
+.input-field {
+  width: 100%;
+  background: rgba(4, 8, 20, 0.6);
+  border: 1px solid rgba(189, 232, 245, 0.10);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #BDE8F5;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+.input-field::placeholder { color: rgba(189, 232, 245, 0.25); }
+.input-field:focus {
+  outline: none;
+  border-color: rgba(73, 136, 196, 0.6);
+  background: rgba(15, 40, 84, 0.25);
+  box-shadow: 0 0 0 3px rgba(73, 136, 196, 0.15);
+}
+.input-field.error {
+  border-color: rgba(248, 113, 113, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
