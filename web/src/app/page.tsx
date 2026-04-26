@@ -27,7 +27,7 @@ export default function Landing() {
             href="/dashboard"
             className="btn-primary inline-flex items-center gap-2 font-mono font-semibold text-xs px-4 py-2 rounded-lg"
           >
-            launch app
+            launch
             <span aria-hidden="true">→</span>
           </Link>
         </div>
@@ -86,7 +86,7 @@ export default function Landing() {
               href="/dashboard"
               className="btn-primary inline-flex items-center gap-2 font-mono font-semibold text-sm px-7 py-3.5 rounded-full"
             >
-              launch dashboard
+              setup rules
               <span aria-hidden="true">→</span>
             </Link>
             <a
@@ -405,7 +405,7 @@ export default function Landing() {
             href="/dashboard"
             className="btn-primary inline-flex items-center gap-3 font-mono font-semibold text-sm px-9 py-4 rounded-full"
           >
-            launch app
+            launch rule
             <span aria-hidden="true">↗</span>
           </Link>
         </div>
