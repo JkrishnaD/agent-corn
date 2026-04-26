@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import type { Rule } from "@agent-corn/shared";
-import { createRule } from "@/lib/api";
+import { createRule, getStatus } from "@/lib/api";
 
 function isValidPubkey(s: string): boolean {
   try {
@@ -14,6 +14,65 @@ function isValidPubkey(s: string): boolean {
     return false;
   }
 }
+
+type Template = {
+  id: string;
+  label: string;
+  blurb: string;
+  build: (ctx: { agent: string; user: string }) => {
+    name: string;
+    reasoning: string;
+    watchAddress: string;
+    thresholdSol: string;
+    actionTo: string;
+    actionAmount: string;
+  };
+};
+
+const TEMPLATES: Template[] = [
+  {
+    id: "auto-topup",
+    label: "auto top-up",
+    blurb: "watch your wallet, top up if low",
+    build: ({ user }) => ({
+      name: "auto top-up",
+      reasoning:
+        "If the watched wallet's balance is genuinely low (not just a temporary 1-second dip during a tx), top it up by sending 0.01 SOL. Be conservative — only fire if balance has been below threshold for a real reason.",
+      watchAddress: user,
+      thresholdSol: "0.5",
+      actionTo: user,
+      actionAmount: "0.01",
+    }),
+  },
+  {
+    id: "demo-fire",
+    label: "demo: always fire",
+    blurb: "high threshold — fires every poll",
+    build: ({ agent, user }) => ({
+      name: "demo: always fire",
+      reasoning:
+        "Demo rule. The watched wallet's balance is below an intentionally high threshold, so this should fire each poll. Confirm execute=true with high confidence — the goal is to demo on-chain reasoning + ER settlement.",
+      watchAddress: agent,
+      thresholdSol: "1000",
+      actionTo: user,
+      actionAmount: "0.001",
+    }),
+  },
+  {
+    id: "treasury-guard",
+    label: "treasury guard",
+    blurb: "agent runway monitor",
+    build: ({ agent, user }) => ({
+      name: "treasury guard",
+      reasoning:
+        "If the agent's own balance is genuinely depleting (not a momentary dip from tx fees), send a small alert transfer to the operator wallet. Confidence should drop if balance is only briefly low.",
+      watchAddress: agent,
+      thresholdSol: "0.2",
+      actionTo: user,
+      actionAmount: "0.001",
+    }),
+  },
+];
 
 export function RuleBuilder({ onCreated }: { onCreated: (r: Rule) => void }) {
   const { publicKey } = useWallet();
@@ -25,6 +84,30 @@ export function RuleBuilder({ onCreated }: { onCreated: (r: Rule) => void }) {
   const [actionAmount, setActionAmount] = useState("0.01");
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [agentWallet, setAgentWallet] = useState<string | null>(null);
+  const [activeTpl, setActiveTpl] = useState<string | null>(null);
+
+  useEffect(() => {
+    getStatus()
+      .then((s) => setAgentWallet(s.agentWallet))
+      .catch(() => {});
+  }, []);
+
+  function applyTemplate(t: Template) {
+    if (!publicKey || !agentWallet) return;
+    const v = t.build({
+      agent: agentWallet,
+      user: publicKey.toBase58(),
+    });
+    setName(v.name);
+    setReasoning(v.reasoning);
+    setWatchAddress(v.watchAddress);
+    setThresholdSol(v.thresholdSol);
+    setActionTo(v.actionTo);
+    setActionAmount(v.actionAmount);
+    setErrors({});
+    setActiveTpl(t.id);
+  }
 
   function validate(): Record<string, string> {
     const e: Record<string, string> = {};
@@ -81,20 +164,74 @@ export function RuleBuilder({ onCreated }: { onCreated: (r: Rule) => void }) {
       setWatchAddress("");
       setActionTo("");
       setErrors({});
+      setActiveTpl(null);
     } finally {
       setSubmitting(false);
     }
   }
 
+  const templatesReady = Boolean(publicKey && agentWallet);
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* Template chips */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ice/50">
+            quick start
+          </span>
+          {!templatesReady && (
+            <span className="font-mono text-[9px] text-ice/30">
+              {publicKey ? "loading agent…" : "connect wallet for templates"}
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {TEMPLATES.map((t) => {
+            const active = activeTpl === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                disabled={!templatesReady}
+                onClick={() => applyTemplate(t)}
+                className={`group relative text-left rounded-xl border p-3 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+                  active
+                    ? "border-sky/50 bg-sky/10"
+                    : "border-line bg-bg/40 hover:border-edge hover:bg-panel/60"
+                }`}
+              >
+                {active && (
+                  <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-sky shadow-[0_0_8px_rgba(73,136,196,0.8)]" />
+                )}
+                <div
+                  className={`font-mono text-xs font-semibold mb-1 ${
+                    active ? "text-sky" : "text-ice/90"
+                  }`}
+                >
+                  {t.label}
+                </div>
+                <div className="font-mono text-[10px] text-ice/40 leading-snug">
+                  {t.blurb}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="h-px bg-gradient-to-r from-transparent via-edge to-transparent" />
+
       <Field label="name" htmlFor="rule-name" error={errors.name}>
         <input
           id="rule-name"
           autoComplete="off"
           className={`input-field ${errors.name ? "error" : ""}`}
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            setName(e.target.value);
+            setActiveTpl(null);
+          }}
           placeholder="auto top-up"
         />
       </Field>
@@ -110,7 +247,10 @@ export function RuleBuilder({ onCreated }: { onCreated: (r: Rule) => void }) {
             errors.reasoning ? "error" : ""
           }`}
           value={reasoning}
-          onChange={(e) => setReasoning(e.target.value)}
+          onChange={(e) => {
+            setReasoning(e.target.value);
+            setActiveTpl(null);
+          }}
           placeholder="If wallet balance is genuinely low (not just a temp dip), top up with 0.01 SOL"
         />
       </Field>
@@ -127,7 +267,10 @@ export function RuleBuilder({ onCreated }: { onCreated: (r: Rule) => void }) {
             spellCheck={false}
             className={`input-field ${errors.watchAddress ? "error" : ""}`}
             value={watchAddress}
-            onChange={(e) => setWatchAddress(e.target.value)}
+            onChange={(e) => {
+              setWatchAddress(e.target.value);
+              setActiveTpl(null);
+            }}
             placeholder="pubkey"
           />
         </Field>
@@ -141,21 +284,23 @@ export function RuleBuilder({ onCreated }: { onCreated: (r: Rule) => void }) {
             inputMode="decimal"
             className={`input-field ${errors.thresholdSol ? "error" : ""}`}
             value={thresholdSol}
-            onChange={(e) => setThresholdSol(e.target.value)}
+            onChange={(e) => {
+              setThresholdSol(e.target.value);
+              setActiveTpl(null);
+            }}
           />
         </Field>
-        <Field
-          label="send to"
-          htmlFor="rule-sendto"
-          error={errors.actionTo}
-        >
+        <Field label="send to" htmlFor="rule-sendto" error={errors.actionTo}>
           <input
             id="rule-sendto"
             autoComplete="off"
             spellCheck={false}
             className={`input-field ${errors.actionTo ? "error" : ""}`}
             value={actionTo}
-            onChange={(e) => setActionTo(e.target.value)}
+            onChange={(e) => {
+              setActionTo(e.target.value);
+              setActiveTpl(null);
+            }}
             placeholder="pubkey"
           />
         </Field>
@@ -169,7 +314,10 @@ export function RuleBuilder({ onCreated }: { onCreated: (r: Rule) => void }) {
             inputMode="decimal"
             className={`input-field ${errors.actionAmount ? "error" : ""}`}
             value={actionAmount}
-            onChange={(e) => setActionAmount(e.target.value)}
+            onChange={(e) => {
+              setActionAmount(e.target.value);
+              setActiveTpl(null);
+            }}
           />
         </Field>
       </div>
