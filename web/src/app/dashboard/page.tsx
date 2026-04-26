@@ -2,8 +2,16 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+
+// Wallet adapter button hydrates differently on client (icon + label) than
+// the placeholder Next.js renders on the server. Mount client-only.
+const WalletMultiButton = dynamic(
+  async () =>
+    (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
+  { ssr: false }
+);
 import type { Rule, AgentEvent, AgentStatus } from "@agent-corn/shared";
 import {
   listRules,
@@ -11,6 +19,8 @@ import {
   toggleRule,
   subscribeEvents,
   getStatus,
+  pauseAgent,
+  resumeAgent,
 } from "@/lib/api";
 import { RuleBuilder } from "@/components/rule-builder";
 import { EventTimeline } from "@/components/event-timeline";
@@ -21,6 +31,7 @@ export default function Dashboard() {
   const [events, setEvents] = useState<AgentEvent[]>([]);
   const [status, setStatus] = useState<AgentStatus | null>(null);
   const [showBuilder, setShowBuilder] = useState(false);
+  const [pausing, setPausing] = useState(false);
 
   useEffect(() => {
     listRules()
@@ -33,8 +44,28 @@ export default function Dashboard() {
       (e) => setEvents((prev) => [e, ...prev].slice(0, 200)),
       (snapshot) => setEvents(snapshot)
     );
-    return unsub;
+    // Poll status every 3s to keep paused flag fresh in case multiple
+    // dashboard tabs toggle it.
+    const t = setInterval(
+      () => getStatus().then(setStatus).catch(() => {}),
+      3000
+    );
+    return () => {
+      unsub();
+      clearInterval(t);
+    };
   }, []);
+
+  const handleToggleAgent = useCallback(async () => {
+    if (!status) return;
+    setPausing(true);
+    try {
+      const r = status.paused ? await resumeAgent() : await pauseAgent();
+      setStatus({ ...status, paused: r.paused });
+    } finally {
+      setPausing(false);
+    }
+  }, [status]);
 
   const handleCreated = useCallback((r: Rule) => {
     setRules((prev) => [r, ...prev]);
@@ -74,23 +105,42 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-3">
             {status && (
-              <div className="hidden sm:flex items-center gap-2 border border-line bg-panel/40 backdrop-blur-md rounded-full px-3.5 py-1.5">
+              <button
+                onClick={handleToggleAgent}
+                disabled={pausing}
+                title={status.paused ? "resume agent" : "pause agent"}
+                className={`group hidden sm:flex items-center gap-2 backdrop-blur-md rounded-full px-3.5 py-1.5 border transition-all disabled:opacity-50 ${
+                  status.paused
+                    ? "border-amber-400/30 bg-amber-400/10 hover:bg-amber-400/15"
+                    : "border-line bg-panel/40 hover:border-edge hover:bg-panel/60"
+                }`}
+              >
                 <span className="relative flex h-1.5 w-1.5">
-                  {status.running && (
+                  {!status.paused && status.running && (
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky opacity-70" />
                   )}
                   <span
                     className={`relative inline-flex h-1.5 w-1.5 rounded-full ${
-                      status.running
+                      status.paused
+                        ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.9)]"
+                        : status.running
                         ? "bg-sky shadow-[0_0_8px_rgba(73,136,196,0.9)]"
                         : "bg-ice/20"
                     }`}
                   />
                 </span>
-                <span className="font-mono text-[10px] text-ice/60 tracking-[0.2em] uppercase">
-                  {status.running ? "agent live" : "offline"}
+                <span
+                  className={`font-mono text-[10px] tracking-[0.2em] uppercase ${
+                    status.paused ? "text-amber-300" : "text-ice/60"
+                  }`}
+                >
+                  {pausing
+                    ? "…"
+                    : status.paused
+                    ? "paused · resume"
+                    : "live · pause"}
                 </span>
-              </div>
+              </button>
             )}
             <WalletMultiButton
               style={{

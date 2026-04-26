@@ -26,6 +26,16 @@ export async function deleteRule(id: string): Promise<void> {
   await fetch(`${BASE}/rules/${id}`, { method: "DELETE" });
 }
 
+export async function pauseAgent(): Promise<{ paused: boolean }> {
+  const r = await fetch(`${BASE}/agent/pause`, { method: "POST" });
+  return r.json();
+}
+
+export async function resumeAgent(): Promise<{ paused: boolean }> {
+  const r = await fetch(`${BASE}/agent/resume`, { method: "POST" });
+  return r.json();
+}
+
 export async function toggleRule(id: string, enabled: boolean): Promise<Rule> {
   const r = await fetch(`${BASE}/rules/${id}`, {
     method: "PATCH",

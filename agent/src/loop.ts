@@ -14,6 +14,7 @@ export class AgentLoop {
   private monitor = new PollingMonitor();
   private listeners: Set<Listener> = new Set();
   private running = false;
+  private paused = false;
 
   on(l: Listener) {
     this.listeners.add(l);
@@ -52,10 +53,24 @@ export class AgentLoop {
     return [...this.rules.values()];
   }
 
+  isPaused(): boolean {
+    return this.paused;
+  }
+
+  pause() {
+    this.paused = true;
+  }
+
+  resume() {
+    this.paused = false;
+  }
+
   async start() {
     if (this.running) return;
     this.running = true;
-    await this.monitor.start(() => [...this.rules.values()], {
+    // Monitor only sees rules when not paused — the rules getter returns []
+    // while paused, so no triggers fire and no LLM calls run.
+    await this.monitor.start(() => (this.paused ? [] : [...this.rules.values()]), {
       onTrigger: (c) => this.handleTrigger(c),
       onCheck: (e) => this.emit(e),
     });

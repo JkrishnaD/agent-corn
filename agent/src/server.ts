@@ -31,11 +31,22 @@ export function startServer(loop: AgentLoop) {
     if (req.method === "GET" && url.pathname === "/status") {
       const status: AgentStatus = {
         running: true,
+        paused: loop.isPaused(),
         agentWallet: loadAgentKeypair().publicKey.toBase58(),
         rulesActive: loop.listRules().filter((r) => r.enabled).length,
         lastEvent: eventLog.at(-1) ?? null,
       };
       return json(res, 200, status);
+    }
+
+    if (req.method === "POST" && url.pathname === "/agent/pause") {
+      loop.pause();
+      return json(res, 200, { paused: true });
+    }
+
+    if (req.method === "POST" && url.pathname === "/agent/resume") {
+      loop.resume();
+      return json(res, 200, { paused: false });
     }
 
     if (req.method === "GET" && url.pathname === "/rules") {

@@ -56,6 +56,7 @@ export interface AgentEvent {
 
 export interface AgentStatus {
   running: boolean;
+  paused: boolean;
   agentWallet: string;
   rulesActive: number;
   lastEvent: AgentEvent | null;
